@@ -1,7 +1,8 @@
 import scss
 from bottle import route, error, request, HTTPResponse, redirect
 
-from .chat import render_chat, render_message, ChatStorage
+from .chat import ChatStorage
+from .render import render_chat, render_message, render_disclaimer
 from . import config
 
 
@@ -15,7 +16,7 @@ def error404(error):
     return redirect("/")
 
 
-@route('/style.css')
+@route("/style.css")
 def style_view():
     return HTTPResponse(
         STATICS["style"],
@@ -23,21 +24,19 @@ def style_view():
     )
 
 
-@route('/')
-def index_view():
-    yield render_chat("")
-    for message in ChatStorage.singleton().iter_messages(""):
-        yield render_message(message)
+@route("/disclaimer")
+def disclaimer_view():
+    return render_disclaimer()
 
 
-@route('/<room:path>')
+@route(f"/<room:re:{config.ROOM_REGEX}>")
 def chat_view(room):
     yield render_chat(room)
     for message in ChatStorage.singleton().iter_messages(room):
         yield render_message(message)
 
 
-@route('/<room:path>', method="POST")
+@route(f"/<room:re:{config.ROOM_REGEX}>", method="POST")
 def chat_view(room):
     if request.forms.get("message"):
         ChatStorage.singleton().post_message(

@@ -6,6 +6,7 @@
 body {
     background: #f0f0f0;
     padding: .5em;
+    font-family: sans-serif;
 }
 
 header, main {
@@ -43,7 +44,7 @@ header {
     }
 
     .title {
-        font-size: 150%;
+        font-size: 133%;
         text-align: center;
         margin-bottom: 1em;
     }
@@ -80,6 +81,21 @@ main {
     from {opacity: 0} to {opacity: 1}
 }
 
+.top-head {
+    font-size: 75%;
+}
+.top-head, .disclaimer {
+    max-width: 640px;
+    margin: 0 auto;
+}
+.disclaimer {
+    margin-top: 1em;
+    p {
+        margin: .5em 0;
+    }
+}
+
+
 .flex-row {
     display: flex;
     flex-direction: row;
@@ -103,6 +119,9 @@ main {
         &:focus-visible {
             outline: 1.5px solid #888;
         }
+    }
+    a {
+        color: #a2a2ff;
     }
     textarea {
         color: #d0d0d0;

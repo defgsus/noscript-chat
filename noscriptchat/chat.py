@@ -3,54 +3,14 @@ import threading
 import time
 import uuid
 import html
-from typing import Generator, Optional
-
-import bottle
+from typing import Generator, Optional, Dict, List
 
 from noscriptchat import config
 
 
-_index_template = (config.TEMPLATE_PATH / "index.html").read_text()
-_message_template = (config.TEMPLATE_PATH / "message.html").read_text()
-
-
-def render_chat(
-        room: str,
-        user: Optional[str] = None,
-) -> str:
-    """
-    Renders the beginning of index.html for a specific room
-    """
-    url = config.URL
-    if room:
-        url = f"{url}/{room}"
-
-    return bottle.template(
-        _index_template,
-        title=f"{room}@noscript-chat" if room else "noscript-chat",
-        url=url,
-        room=room or "",
-        user=user or "",
-    )
-
-
-def render_message(message: dict):
-    """
-    Renders a single message
-    """
-    message = message.copy()
-    is_new = (datetime.datetime.utcnow() - message["date"]).seconds <= config.MESSAGE_CHECK_INTERVAL * 3
-    message["date"] = message["date"].strftime("%Y-%m-%d %H:%M UTC")
-    message["user"] = message["user"] or "anonymous"
-    message["classes"] = "new" if is_new else ""
-    # bottle.template already escapes everything
-    # message["message"] = html.escape(message["message"])
-    return bottle.template(_message_template, **message)
-
-
 class ChatStorage:
     """
-    Class to be used a singleton that holds all chat messages in memory
+    singleton class that holds all chat messages in memory
     """
     _singleton = None
 
@@ -61,23 +21,29 @@ class ChatStorage:
         return cls._singleton
 
     def __init__(self):
-        self._rooms = {}
+        self._messages_per_room: Dict[str, List[dict]] = {}
         self._lock = threading.RLock()
 
     def post_message(self, room: str, message: str, user: Optional[str] = None):
         """
         Add a new message to a chat-room.
         """
-        with self._lock:
-            if room not in self._rooms:
-                self._rooms[room] = []
+        if user:
+            user = user[:config.MAX_NAME_LENGTH]
 
-            self._rooms[room].append({
+        with self._lock:
+            if room not in self._messages_per_room:
+                self._messages_per_room[room] = []
+
+            messages = self._messages_per_room[room]
+            messages.append({
                 "date": datetime.datetime.utcnow(),
                 "uuid": uuid.uuid4(),
                 "user": user or None,
                 "message": message[:config.MAX_MESSAGE_LENGTH],
             })
+            if len(messages) > config.MAX_MESSAGES:
+                messages.pop(0)
 
     def iter_messages(self, room: str = "") -> Generator[dict, None, None]:
         """
@@ -87,13 +53,14 @@ class ChatStorage:
 
         :return: generator of dict
         """
+        # TODO: this set currently grows unlimited
         yielded_ids = set()
         while True:
             messages = None
 
             with self._lock:
-                if room in self._rooms:
-                    messages = list(self._rooms[room])
+                if room in self._messages_per_room:
+                    messages = list(self._messages_per_room[room])
 
             if messages:
                 for message in messages:
