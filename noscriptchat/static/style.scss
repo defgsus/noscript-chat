@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #f0f0f0;
+    padding: .5em;
+}
+
+header, main {
+    max-width: 320px;
+}
+
+header textarea, main > div {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.5em;
+    border: 1px solid #aaa;
+    background: #fff;
+}
+
+header {
+    margin: 1em auto;
+    text-align: right;
+
+    textarea {
+        width: 100%;
+        height: 5em;
+        min-height: 1.5em;
+        max-height: 10em;
+        resize: vertical;
+        box-sizing: border-box;
+    }
+
+    button {
+        border: 1px solid #aaa;
+        background: #f5f5f5;
+        padding: 0.25em 1em;
+    }
+    button, input {
+        height: 1.5em;
+    }
+
+    .title {
+        font-size: 150%;
+        text-align: center;
+        margin-bottom: 1em;
+    }
+
+    .controls {
+        margin-top: 0.5em;
+    }
+}
+
+main {
+    margin: 0 auto 0.5em auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+main {
+    .post {
+        margin-bottom: 0.5em;
+
+        &.new {
+            animation: fadein 1.2s;
+        }
+
+        .post-footer {
+            margin-top: 0.75em;
+            opacity: 0.33;
+            font-size: 75%;
+            text-align: right;
+        }
+    }
+}
+
+@keyframes fadein {
+    from {opacity: 0} to {opacity: 1}
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+
+    &.wrap {
+        flex-wrap: wrap;
+    }
+    &.space-between { justify-content: space-between; }
+}
+
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #111;
+        color: #d0d0d0;
+    }
+    input {
+        background: #202020;
+        color: #d0d0d0;
+        border-color: #555;
+        &:focus-visible {
+            outline: 1.5px solid #888;
+        }
+    }
+    textarea {
+        color: #d0d0d0;
+        &:focus-visible {
+            outline: 1.5px solid #888;
+        }
+    }
+    header textarea, main > div {
+        background: #222;
+        border-color: #444 #222 #222 #444;
+    }
+    header {
+        button {
+            background: #555;
+            border-color: #777 #333 #333 #777;
+        }
+    }
+    main {
+        .post {
+            background: #2d2d2d;
+            border-color: #777 #222 #222 #777;
+        }
+    }
+}
