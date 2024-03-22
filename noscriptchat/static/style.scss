@@ -99,50 +99,14 @@ main {
 .flex-row {
     display: flex;
     flex-direction: row;
+    padding: -.2em;
 
+    > div {
+        margin: .2em;
+    }
     &.wrap {
         flex-wrap: wrap;
     }
     &.space-between { justify-content: space-between; }
 }
 
-
-@media (prefers-color-scheme: dark) {
-    body {
-        background: #111;
-        color: #d0d0d0;
-    }
-    input {
-        background: #202020;
-        color: #d0d0d0;
-        border-color: #555;
-        &:focus-visible {
-            outline: 1.5px solid #888;
-        }
-    }
-    a {
-        color: #a2a2ff;
-    }
-    textarea {
-        color: #d0d0d0;
-        &:focus-visible {
-            outline: 1.5px solid #888;
-        }
-    }
-    header textarea, main > div {
-        background: #222;
-        border-color: #444 #222 #222 #444;
-    }
-    header {
-        button {
-            background: #555;
-            border-color: #777 #333 #333 #777;
-        }
-    }
-    main {
-        .post {
-            background: #2d2d2d;
-            border-color: #777 #222 #222 #777;
-        }
-    }
-}

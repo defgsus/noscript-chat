@@ -14,6 +14,7 @@ _disclaimer_template = (config.TEMPLATE_PATH / "disclaimer.html").read_text()
 def render_chat(
         room: str,
         user: Optional[str] = None,
+        colors: str = "auto",
 ) -> str:
     """
     Renders the beginning of index.html for a specific room
@@ -28,14 +29,16 @@ def render_chat(
         url=url,
         room=room or "",
         user=user or "",
+        style=f"style-{colors}.css",
     )
 
 
-def render_disclaimer():
+def render_disclaimer(colors: str = "auto"):
     return bottle.template(
         _disclaimer_template,
         title="Disclaimer",
         url=config.WEBSITE_URL,
+        style=f"style-{colors}.css",
     )
 
 
