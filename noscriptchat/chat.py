@@ -44,7 +44,7 @@ class ChatStorage:
                 "date": datetime.datetime.utcnow(),
                 "uuid": uuid.uuid4(),
                 "user": user or None,
-                "message": self._text_to_web(message[:config.MAX_MESSAGE_LENGTH]),
+                "message": self._text_to_web(message[:config.MAX_MESSAGE_LENGTH]).replace("\n", "\n<br/>"),
             })
             self._clean_messages(messages)
 
