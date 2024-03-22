@@ -2,8 +2,9 @@ import scss
 from bottle import route, error, request, HTTPResponse, redirect
 
 from .chat import ChatStorage
-from .render import render_chat, render_message, render_disclaimer
+from .render import render_chat, render_message, render_disclaimer, render_emoji_page
 from . import config
+
 
 _compiler = scss.Compiler()
 _base_style = _compiler.compile_string((config.STATIC_PATH / "style.scss").read_text())
@@ -41,6 +42,11 @@ def icon_view():
 @route("/disclaimer")
 def disclaimer_view():
     return render_disclaimer(colors=get_style_colors())
+
+
+@route("/emojis")
+def emojis_view():
+    return render_emoji_page(colors=get_style_colors())
 
 
 @route(f"/<room:re:{config.ROOM_REGEX}>")

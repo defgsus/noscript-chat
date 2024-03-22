@@ -21,4 +21,4 @@ MESSAGE_CHECK_INTERVAL_SECONDS = config("MESSAGE_CHECK_INTERVAL_SECONDS", defaul
 MAX_MESSAGES = config("MAX_MESSAGES", default=20, cast=int)
 MAX_MESSAGE_AGE_SECONDS = config("MAX_MESSAGE_AGE_SECONDS", default=60 * 60 * 2, cast=float)
 
-ROOM_REGEX = config("ROOM_REGEX", default=r"[a-z_\-0-9]*")
+ROOM_REGEX = config("ROOM_REGEX", default=r"[a-zA-Z_\-0-9]*")

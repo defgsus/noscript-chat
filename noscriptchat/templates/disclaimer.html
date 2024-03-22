@@ -1,32 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>{{title}}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="{{style}}">
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="top-head flex-row space-between">
-    <div class="flex-row">
-        <div><a href="?light">light</a></div>
-        <div><a href="?dark">dark</a></div>
-    </div>
-    <div class="flex-row">
-        <div><a href="https://github.com/defgsus/noscript-chat" target="_blank">github</a></div>
-        <div><a href="/">chat</a></div>
-    </div>
-</div>
+{% block content %}
 
-
-<div class="disclaimer">
+<div class="wide-container">
     <p>
         Hi! This is an anonymous chat website that
     </p>
     <ul>
         <li>avoids tracking users</li>
         <li>avoids any logging at all</li>
+        <li>does not use cookies or javascript</li>
         <li>uses no database and keeps messages merely in memory for a limited amount of time</li>
     </ul>
     <p>To create a new chat room, add a name to the url:</p>
@@ -39,3 +22,5 @@
 </div>
 
 </body>
+
+{% endblock %}

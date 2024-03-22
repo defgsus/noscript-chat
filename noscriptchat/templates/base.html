@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{style}}">
+</head>
+<body>
+
+<div class="top-head flex-row space-between">
+    <div class="flex-row">
+        <div><a href="?light">light</a></div>
+        <div>|</div>
+        <div><a href="?dark">dark</a></div>
+    </div>
+    <div class="flex-row">
+        <div><a href="/{{random_room}}{{query}}">new private room</a></div>
+        <div>|</div>
+        <div>
+            {% if page == "disclaimer" %}
+                <a href="/{{query}}">chat</a>
+            {% else %}
+                <a href="/disclaimer{{query}}">disclaimer</a>
+            {% endif %}
+        </div>
+        <div>|</div>
+        <div>
+            {% if page == "emojis" %}
+            <a href="/{{query}}">chat</a>
+            {% else %}
+            <a href="/emojis{{query}}">emojis</a>
+            {% endif %}
+        </div>
+        <div>|</div>
+        <div><a href="https://github.com/defgsus/noscript-chat" target="_blank">github</a></div>
+    </div>
+</div>
+
+{% block content %}{% endblock %}
+
+<!--
+</body>
+-->

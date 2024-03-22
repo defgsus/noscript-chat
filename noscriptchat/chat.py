@@ -5,7 +5,8 @@ import uuid
 import html
 from typing import Generator, Optional, Dict, List
 
-from noscriptchat import config
+from . import config
+from .emojify import emojify
 
 
 class ChatStorage:
@@ -27,9 +28,12 @@ class ChatStorage:
     def post_message(self, room: str, message: str, user: Optional[str] = None):
         """
         Add a new message to a chat-room.
+
+        Escaping of user input is done here and the escaped version
+        is stored to memory.
         """
         if user:
-            user = user[:config.MAX_NAME_LENGTH]
+            user = self._text_to_web(user[:config.MAX_NAME_LENGTH])
 
         with self._lock:
             if room not in self._messages_per_room:
@@ -40,7 +44,7 @@ class ChatStorage:
                 "date": datetime.datetime.utcnow(),
                 "uuid": uuid.uuid4(),
                 "user": user or None,
-                "message": message[:config.MAX_MESSAGE_LENGTH],
+                "message": self._text_to_web(message[:config.MAX_MESSAGE_LENGTH]),
             })
             self._clean_messages(messages)
 
@@ -84,3 +88,6 @@ class ChatStorage:
             message = messages[idx]
             if (now - message["date"]).total_seconds() > config.MAX_MESSAGE_AGE_SECONDS:
                 messages.pop(idx)
+
+    def _text_to_web(self, text: str) -> str:
+        return html.escape(emojify(text))

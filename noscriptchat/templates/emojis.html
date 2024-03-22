@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="wide-container">
+    <p>
+        <a href="https://en.wikipedia.org/wiki/Emoji" target="_blank">Emojis</a> are an essential
+        building block of human digital text-based communication. Thank god, the
+        <a href="https://www.unicode.org/emoji/charts/emoji-list.html" target="_blank">
+            unicode standard has adopted</a> to these needs.
+
+        Because of that, you can just copy/paste those beloved images like it was normal text:
+    </p>
+    <p class="text-center">
+        🥱 🥕 🚾
+    </p>
+    <p>
+        It's not very handy though. In social software there has developed a way of writing
+        down those emojis with textual codes. In unicode world, every crazy letter has a name,
+        some of them are just quite long. Below is a list of names that have not more than 20 letters.
+    </p>
+    <p>
+        To use them just write <code>:octopus:</code> and it will be transformed: 🐙
+    </p>
+    <p>
+        (You can practice in a <a href="/{{random_room}}{{query}}">private room</a>)
+    </p>
+    <div class="flex-row wrap space-between">
+        {% for name, sym in emoji_map.items() %}
+            <div><code>:{{name}}:</code> {{sym}}</div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+
+{% endblock %}
