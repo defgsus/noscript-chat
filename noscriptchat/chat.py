@@ -42,14 +42,13 @@ class ChatStorage:
                 "user": user or None,
                 "message": message[:config.MAX_MESSAGE_LENGTH],
             })
-            if len(messages) > config.MAX_MESSAGES:
-                messages.pop(0)
+            self._clean_messages(messages)
 
     def iter_messages(self, room: str = "") -> Generator[dict, None, None]:
         """
         Loop infinitely until new messages arrive.
 
-        :param room: str, the room name
+        :param room: str, the chat room name
 
         :return: generator of dict
         """
@@ -60,7 +59,9 @@ class ChatStorage:
 
             with self._lock:
                 if room in self._messages_per_room:
-                    messages = list(self._messages_per_room[room])
+                    messages = self._messages_per_room[room]
+                    self._clean_messages(messages)
+                    messages = list(messages)
 
             if messages:
                 for message in messages:
@@ -68,4 +69,18 @@ class ChatStorage:
                         yielded_ids.add(message["uuid"])
                         yield message
 
-            time.sleep(config.MESSAGE_CHECK_INTERVAL)
+            time.sleep(config.MESSAGE_CHECK_INTERVAL_SECONDS)
+
+    def _clean_messages(self, messages: List[dict]) -> None:
+        """
+        Remove messages from the list according to config settings
+        """
+        while len(messages) > config.MAX_MESSAGES:
+            messages.pop(0)
+
+        now = datetime.datetime.utcnow()
+
+        for idx in reversed(range(len(messages))):
+            message = messages[idx]
+            if (now - message["date"]).total_seconds() > config.MAX_MESSAGE_AGE_SECONDS:
+                messages.pop(idx)

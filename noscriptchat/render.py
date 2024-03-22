@@ -44,7 +44,7 @@ def render_message(message: dict):
     Renders a single message
     """
     message = message.copy()
-    is_new = (datetime.datetime.utcnow() - message["date"]).seconds <= config.MESSAGE_CHECK_INTERVAL * 3
+    is_new = (datetime.datetime.utcnow() - message["date"]).total_seconds() <= config.MESSAGE_CHECK_INTERVAL_SECONDS * 3
     message["date"] = message["date"].strftime("%Y-%m-%d %H:%M UTC")
     message["user"] = message["user"] or "anonymous"
     message["classes"] = "new" if is_new else ""
