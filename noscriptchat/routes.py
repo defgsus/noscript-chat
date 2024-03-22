@@ -53,11 +53,11 @@ def chat_post_view(room):
     if request.forms.get("message"):
         ChatStorage.singleton().post_message(
             room=room,
-            message=request.forms.get("message"),
-            user=request.forms.get("user"),
+            message=request.forms.getunicode("message"),
+            user=request.forms.getunicode("user"),
         )
 
-    yield from render_chat_endless(room=room, user=request.forms.get("user"))
+    yield from render_chat_endless(room=room, user=request.forms.getunicode("user"))
 
 
 def render_chat_endless(room: str = "", user: str = ""):
