@@ -9,6 +9,42 @@ from . import config
 from .emojify import emojify
 
 
+class ConnectionCounter:
+    """
+    It basically counts if the message loops are still running.
+    """
+    def __init__(self):
+        self._lock = threading.RLock()
+        self._room_connection_timestamps_map: Dict[str, Dict[str, float]] = {}
+        self._last_check_timestamp = 0
+
+    def num_connections(self, room: str = ""):
+        return len(self._room_connection_timestamps_map.get(room, tuple()))
+
+    def update_connection(self, room: str, request_uuid: str) -> int:
+        timestamp_now = datetime.datetime.utcnow().timestamp()
+        with self._lock:
+            # store current timestamp for room/request
+            if room not in self._room_connection_timestamps_map:
+                self._room_connection_timestamps_map[room] = {}
+            self._room_connection_timestamps_map[room][request_uuid] = timestamp_now
+
+            # once and then let one of the threads remove old request ids
+            if timestamp_now - self._last_check_timestamp >= config.MESSAGE_CHECK_INTERVAL_SECONDS:
+
+                for uuid, timestamp in list(self._room_connection_timestamps_map[room].items()):
+                    if timestamp_now - timestamp >= config.MESSAGE_CHECK_INTERVAL_SECONDS * 2:
+                        del self._room_connection_timestamps_map[room][uuid]
+
+                if not self._room_connection_timestamps_map[room]:
+                    del self._room_connection_timestamps_map[room]
+
+        return self.num_connections(room)
+
+
+connection_counter = ConnectionCounter()
+
+
 class ChatStorage:
     """
     singleton class that holds all chat messages in memory
@@ -42,22 +78,26 @@ class ChatStorage:
             messages = self._messages_per_room[room]
             messages.append({
                 "date": datetime.datetime.utcnow(),
-                "uuid": uuid.uuid4(),
+                "uuid": str(uuid.uuid4()),
                 "user": user or None,
                 "message": self._text_to_web(message[:config.MAX_MESSAGE_LENGTH]).replace("\n", "\n<br/>"),
             })
             self._clean_messages(messages)
 
-    def iter_messages(self, room: str = "") -> Generator[dict, None, None]:
+    def iter_messages(self, request_uuid: str, room: str = "") -> Generator[dict, None, None]:
         """
         Loop infinitely until new messages arrive.
 
+        :param request_uuid: str, id of the request/response stream
         :param room: str, the chat room name
 
         :return: generator of dict
+            if there's a {"type": "info"} in there it's an info object,
+            otherwise it's the message
         """
         # TODO: this set currently grows unlimited
         yielded_ids = set()
+        last_yielded_connection_count = -1
         while True:
             messages = None
 
@@ -72,6 +112,11 @@ class ChatStorage:
                     if message["uuid"] not in yielded_ids:
                         yielded_ids.add(message["uuid"])
                         yield message
+
+            num_connections = connection_counter.update_connection(room, request_uuid)
+            if num_connections != last_yielded_connection_count:
+                yield {"type": "info", "num_connections": num_connections}
+                last_yielded_connection_count = num_connections
 
             time.sleep(config.MESSAGE_CHECK_INTERVAL_SECONDS)
 

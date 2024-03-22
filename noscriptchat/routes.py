@@ -1,3 +1,8 @@
+import datetime
+import threading
+import uuid
+from typing import Dict
+
 import scss
 from bottle import route, error, request, HTTPResponse, redirect
 
@@ -51,11 +56,14 @@ def emojis_view():
 
 @route(f"/<room:re:{config.ROOM_REGEX}>")
 def chat_view(room: str):
-    yield from render_chat_endless(room=room)
+    request_uuid = str(uuid.uuid4())
+    yield from render_chat_endless(request_uuid=request_uuid, room=room)
 
 
 @route(f"/<room:re:{config.ROOM_REGEX}>", method="POST")
 def chat_post_view(room):
+    request_uuid = str(uuid.uuid4())
+
     if request.forms.get("message"):
         ChatStorage.singleton().post_message(
             room=room,
@@ -63,13 +71,13 @@ def chat_post_view(room):
             user=request.forms.getunicode("user"),
         )
 
-    yield from render_chat_endless(room=room, user=request.forms.getunicode("user"))
+    yield from render_chat_endless(request_uuid=request_uuid, room=room, user=request.forms.getunicode("user"))
 
 
-def render_chat_endless(room: str = "", user: str = ""):
+def render_chat_endless(request_uuid: str, room: str = "", user: str = ""):
     yield render_chat(room=room, user=user, colors=get_style_colors())
 
-    for message in ChatStorage.singleton().iter_messages(room):
+    for message in ChatStorage.singleton().iter_messages(request_uuid, room):
         yield render_message(message)
 
 

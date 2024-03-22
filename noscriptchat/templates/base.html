@@ -18,18 +18,18 @@
         <div><a href="/{{random_room}}{{query}}">new private room</a></div>
         <div>|</div>
         <div>
-            {% if page == "disclaimer" %}
-                <a href="/{{query}}">chat</a>
-            {% else %}
-                <a href="/disclaimer{{query}}">disclaimer</a>
-            {% endif %}
-        </div>
-        <div>|</div>
-        <div>
             {% if page == "emojis" %}
             <a href="/{{query}}">chat</a>
             {% else %}
             <a href="/emojis{{query}}">emojis</a>
+            {% endif %}
+        </div>
+        <div>|</div>
+        <div>
+            {% if page == "disclaimer" %}
+            <a href="/{{query}}">chat</a>
+            {% else %}
+            <a href="/disclaimer{{query}}">disclaimer</a>
             {% endif %}
         </div>
         <div>|</div>

@@ -14,10 +14,12 @@ def main():
     args = parser.parse_args()
 
     if args.command == "server":
+        # bottle.app().add_hook("before_request", routes.on_request)
+        # bottle.app().add_hook("after_request", routes.on_request_closed)
         bottle.run(
             host=config.HOST,
             port=config.PORT,
-            debug=True,
+            debug=config.DEBUG,
             server="cheroot",
             numthreads=config.MAX_VISITORS,
         )

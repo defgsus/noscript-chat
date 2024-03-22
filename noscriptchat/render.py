@@ -80,6 +80,16 @@ def render_message(message: dict):
     """
     Renders a single message
     """
+    if message.get("type") == "info":
+        markup = []
+        if "num_connections" in message:
+            if message["num_connections"] <= 1:
+                sub_title = "you are alone"
+            else:
+                sub_title = f'about {message["num_connections"]} connections'
+            markup.append("""<style>#sub-title::before{content:"%s"}</style>""" % sub_title)
+        return "".join(markup)
+
     message = message.copy()
     is_new = (datetime.datetime.utcnow() - message["date"]).total_seconds() <= config.MESSAGE_CHECK_INTERVAL_SECONDS * 3
 
